@@ -31,16 +31,23 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'string', 'in:student,admin'],
+            // We remove 'role' from validation because we determine it ourselves now
+            'admin_code' => ['nullable', 'string'],
         ]);
+
+        /** * ROLE LOGIC:
+         * If they type the secret code, they become an admin.
+         * Otherwise, they are automatically a student.
+         */
+        $role = ($request->admin_code === 'TAMUT-ADMIN-2026') ? 'admin' : 'student';
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role,
+            'role' => $role,
         ]);
 
         event(new Registered($user));
