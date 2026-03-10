@@ -17,7 +17,6 @@ Route::get('/admin/inventory', function () {
     return view('admin.inventory');
 })->middleware(['auth', 'admin'])->name('admin.inventory');
 
-
 // PROFILE ROUTES
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
